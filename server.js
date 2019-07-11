@@ -1,10 +1,11 @@
 const express = require('express');
-// const postsRouter = require('./posts/postRouter.js')
+const postsRouter = require('./posts/postRouter.js')
 
 //custom middleware
 
 function logger(req, res, next) {
   console.log(`${req.method} to ${req.url} ${req.get('Origin')} on [${new Date().toISOString()}]`);
+  next()
 };
 
 const server = express();
