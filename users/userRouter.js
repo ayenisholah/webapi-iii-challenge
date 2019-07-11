@@ -3,17 +3,25 @@ const Users = require('./userDb');
 const Posts = require('../posts/postDb');
 const router = express.Router();
 
+async function validateUserId(req, res, next) {
+  let { id } = req.params;
 
-// async function validateUserId(req, res, next) {
-//   let { id } = req.params;
+  if (isNaN(parseInt(id, 10))) {
+    res
+      .set('X-Invalid', 'Invalid-ID')
+      .json({ message: "Invalid user ID" });
+  } else {
+    req.validate = true;
+    const user = await Users.getById(id);
 
-//   if (isNaN(parseInt(id, 10))) {
-//     res
-//       .set('X-Invalid', 'Invalid-ID')
-//       .status(400)
-//       .json({ message: "Invalid user ID" });
-//   }
-// }
+    if (user) {
+      req.user = user;
+      next()
+    } else {
+      res.status(404).json({ message: 'good job with giving me a number, but there is no hub with that id'})
+    }
+  }
+}
 
 router.post('/', async (req, res) => {
   try {
@@ -53,7 +61,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', validateUserId, async (req, res) => {
   try {
     const user = await Users.getById(req.params.id);
 
